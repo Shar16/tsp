@@ -1,0 +1,54 @@
+{
+  "emails": [
+    {
+      "id": "1",
+      "subject": "Project Update Meeting",
+      "from": "manager@company.com",
+      "to": "test@example.com",
+      "date": "2025-03-31T14:30:00Z",
+      "body": "Hi team, Let's meet tomorrow at 10 AM to discuss the project progress. Please prepare your updates.",
+      "isRead": false,
+      "folder": "inbox"
+    },
+    {
+      "id": "2",
+      "subject": "Welcome to AudioEmailer",
+      "from": "support@audioemails.com",
+      "to": "test@example.com",
+      "date": "2025-03-31T12:00:00Z",
+      "body": "Welcome to AudioEmailer! We're excited to help you manage your emails through voice. Here's how to get started...",
+      "isRead": true,
+      "folder": "inbox"
+    },
+    {
+      "id": "3",
+      "subject": "Invoice #12345",
+      "from": "billing@service.com",
+      "to": "test@example.com",
+      "date": "2025-03-30T09:15:00Z",
+      "body": "Your invoice for March 2025 is attached. Total amount due: $150.00. Please process the payment at your earliest convenience.",
+      "isRead": false,
+      "folder": "inbox"
+    },
+    {
+      "id": "4",
+      "subject": "Draft: Quarterly Report",
+      "from": "test@example.com",
+      "to": "team@company.com",
+      "date": "2025-03-29T16:45:00Z",
+      "body": "Here's the draft of Q1 2025 report. Please review and provide feedback by Friday.",
+      "isRead": true,
+      "folder": "drafts"
+    },
+    {
+      "id": "5",
+      "subject": "Re: Client Meeting",
+      "from": "client@external.com",
+      "to": "test@example.com",
+      "date": "2025-03-28T11:20:00Z",
+      "body": "Thank you for the meeting. I've reviewed the proposal and have some questions about the timeline.",
+      "isRead": true,
+      "folder": "inbox"
+    }
+  ]
+}
