@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { of } from 'rxjs';
 
 interface LoginCredentials {
   email: string;
@@ -45,28 +46,12 @@ export class AuthService {
     this.isLoading.set(false);
   }
 
-  login(credentials: LoginCredentials): void {
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
-    this.http
-      .post<LoginResponse>(`${this.API_URL}/api/users/login`, credentials)
-      .subscribe({
-        next: (response) => {
-          console.log('Storing token:', response.accessToken);
-          this.storeToken(response.accessToken);
-          this.isLoggedIn.set(true);
-          this.isLoading.set(false);
-          this.errorMessage.set(null);
-          console.log('Login successful:', response);
-          this.router.navigate(['/dashboard']);
-        },
-        error: (error) => {
-          this.isLoading.set(false);
-          this.errorMessage.set('Invalid email or password');
-          console.error('Login failed:', error);
-        },
-      });
+  login(email: string, password: string) {
+    // Temporary fake login
+    localStorage.setItem('token', 'fake-jwt-token');
+    return of(true); // returns Observable true immediately
   }
+  
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);

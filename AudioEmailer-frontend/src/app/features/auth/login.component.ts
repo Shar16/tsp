@@ -105,19 +105,29 @@ export class loginPage {
     this.authService.logout();
   }
 
-  async loginUser() {
+  loginUser() {
     this.errorMessage.set('');
-
+  
     if (!this.email() || !this.password()) {
       this.errorMessage.set('Please enter both email and password.');
       return;
     }
-
+  
     this.isLoading.set(true);
-
-    this.authService.login({
-      email: this.email(),
-      password: this.password(),
+  
+    this.authService.login(this.email(), this.password()).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => {
+        this.errorMessage.set('Login failed. Please try again.');
+        this.isLoading.set(false);
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
     });
   }
+  
+  
 }
