@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'auth-login',
@@ -93,13 +94,12 @@ import { finalize } from 'rxjs';
 })
 export class loginPage {
   authService = inject(AuthService);
+  router = inject(Router);
 
   email = signal('');
   password = signal('');
   isLoading = this.authService.isLoading;
   errorMessage = this.authService.errorMessage;
-
-  router = inject(Router);
 
   constructor() {
     this.authService.logout();
@@ -107,19 +107,21 @@ export class loginPage {
 
   loginUser() {
     this.errorMessage.set('');
-  
+
     if (!this.email() || !this.password()) {
       this.errorMessage.set('Please enter both email and password.');
       return;
     }
-  
+
     this.isLoading.set(true);
-  
+
     this.authService.login(this.email(), this.password()).subscribe({
       next: () => {
+        console.log('Login successful! Navigating to dashboard...');
         this.router.navigate(['/dashboard']);
       },
       error: () => {
+        console.log('Login failed.');
         this.errorMessage.set('Login failed. Please try again.');
         this.isLoading.set(false);
       },
@@ -128,6 +130,4 @@ export class loginPage {
       }
     });
   }
-  
-  
 }
