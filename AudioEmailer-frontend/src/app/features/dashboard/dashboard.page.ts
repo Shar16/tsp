@@ -159,7 +159,7 @@ export class DashboardPage implements OnInit {
       this.settingsService.isLoading() === false &&
       this.settingsService.linkedAccounts().length == 0
     ) {
-      this.showOnboarding.set(true);
+      //this.showOnboarding.set(true); //
     }
   });
 

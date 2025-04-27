@@ -1,9 +1,8 @@
 import { EmailService } from './email.service';
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, of } from 'rxjs'; // Make sure 'of' is imported
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
 
 interface LoginCredentials {
   email: string;
@@ -25,6 +24,7 @@ export interface EmailAuthResponse {
 export class AuthService {
   private readonly API_URL = 'https://audio-emailer-dev.onrender.com';
   private readonly TOKEN_KEY = 'auth_token';
+  
   router = inject(Router);
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -46,12 +46,13 @@ export class AuthService {
     this.isLoading.set(false);
   }
 
-  login(email: string, password: string) {
-    // Temporary fake login
-    localStorage.setItem('token', 'fake-jwt-token');
-    return of(true); // returns Observable true immediately
+  // 🔥 THIS IS THE IMPORTANT PART (FAKE LOGIN)
+  login(email: string, password: string): Observable<boolean> {
+    console.log('Fake login called with:', email, password); // See this in console for debug
+    localStorage.setItem(this.TOKEN_KEY, 'fake-jwt-token'); // Store fake token
+    this.isLoggedIn.set(true);
+    return of(true); // Return success immediately
   }
-  
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
