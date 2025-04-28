@@ -133,6 +133,8 @@ export class DashboardPage implements OnInit {
   ngOnInit() {
     console.log('Dashboard page initialized');
     this.settingsService.getUserSettings();
+    this.emailService.emails.set(this.emailService.getDummyEmails());
+
   }
 
   fetchEmails = effect(() => {

@@ -33,7 +33,7 @@ export class EmailService {
     return this.http.get<any>(`${this.apiUrl}/api/emails`, { params }).pipe(
       map((response) => {
         if (response.data?.messages && accountType === 'GMAIL') {
-          return response.data.messages;
+          return this.parseGmailMessages(response.data.messages);
         }
         return response.data || [];
       })
@@ -66,70 +66,65 @@ export class EmailService {
     });
   }
 
-  // private parseGmailMessages(messages: any[]): Email[] {
-  //   return messages.map((message) => {
-  //     const headers = message.payload.headers || [];
-  //     const subject =
-  //       headers.find((h: any) => h.name === 'Subject')?.value || 'No Subject';
-  //     const sender = headers.find((h: any) => h.name === 'From')?.value || '';
-  //     const date = headers.find((h: any) => h.name === 'Date')?.value || '';
+  private parseGmailMessages(messages: any[]): Email[] {
+    return messages.map((message) => {
+      const headers = message.payload.headers || [];
+      const subject =
+        headers.find((h: any) => h.name === 'Subject')?.value || 'No Subject';
+      const fromHeader = headers.find((h: any) => h.name === 'From')?.value || '';
+      const dateHeader = headers.find((h: any) => h.name === 'Date')?.value || '';
 
-  //     // Extract sender name and email address
-  //     const senderMatch = sender.match(
-  //       /^(?:"?([^"]*)"?\s)?(?:<?(.+@[^>]+)>?)$/
-  //     );
-  //     const senderName = senderMatch?.[1] || sender;
-  //     const senderAddress = senderMatch?.[2] || sender;
+      let body = '';
+      let attachments: any[] = [];
 
-  //     let body = '';
-  //     let attachments: any[] = [];
+      if (message.payload.mimeType === 'text/plain') {
+        body = this.decodeBase64(message.payload.body.data || '');
+      } else if (message.payload.parts) {
+        const textPart = message.payload.parts.find(
+          (part: any) =>
+            part.mimeType === 'text/plain' ||
+            (part.parts &&
+              part.parts.find((p: any) => p.mimeType === 'text/plain'))
+        );
 
-  //     if (message.payload.mimeType === 'text/plain') {
-  //       body = this.decodeBase64(message.payload.body.data || '');
-  //     } else if (message.payload.parts) {
-  //       const textPart = message.payload.parts.find(
-  //         (part: any) =>
-  //           part.mimeType === 'text/plain' ||
-  //           (part.parts &&
-  //             part.parts.find((p: any) => p.mimeType === 'text/plain'))
-  //       );
+        if (textPart) {
+          if (textPart.body.data) {
+            body = this.decodeBase64(textPart.body.data);
+          } else if (textPart.parts) {
+            const innerTextPart = textPart.parts.find(
+              (p: any) => p.mimeType === 'text/plain'
+            );
+            if (innerTextPart && innerTextPart.body.data) {
+              body = this.decodeBase64(innerTextPart.body.data);
+            }
+          }
+        }
 
-  //       if (textPart) {
-  //         if (textPart.body.data) {
-  //           body = this.decodeBase64(textPart.body.data);
-  //         } else if (textPart.parts) {
-  //           const innerTextPart = textPart.parts.find(
-  //             (p: any) => p.mimeType === 'text/plain'
-  //           );
-  //           if (innerTextPart && innerTextPart.body.data) {
-  //             body = this.decodeBase64(innerTextPart.body.data);
-  //           }
-  //         }
-  //       }
+        attachments = message.payload.parts
+          .filter((part: any) => part.filename && part.filename.length > 0)
+          .map((part: any) => ({
+            id: part.body.attachmentId,
+            filename: part.filename,
+            mimeType: part.mimeType,
+            size: part.body.size,
+          }));
+      }
 
-  //       attachments = message.payload.parts
-  //         .filter((part: any) => part.filename && part.filename.length > 0)
-  //         .map((part: any) => ({
-  //           id: part.body.attachmentId,
-  //           filename: part.filename,
-  //           mimeType: part.mimeType,
-  //           size: part.body.size,
-  //         }));
-  //     }
-
-  //     return {
-  //       _id: message.id,
-  //       title: subject,
-  //       body,
-  //       senderName,
-  //       senderAddress,
-  //       timestamp:
-  //         date || new Date(parseInt(message.internalDate)).toISOString(),
-  //       attachments,
-  //       raw: message,
-  //     };
-  //   });
-  // }
+      return {
+        threadId: message.threadId || message.id,
+        labelIds: message.labelIds || [],
+        snippet: message.snippet || '',
+        from: fromHeader,
+        to: '', // could be parsed later
+        subject,
+        texts: [body],
+        timestamp: dateHeader || new Date(parseInt(message.internalDate)).toISOString(),
+        date: dateHeader || new Date(parseInt(message.internalDate)).toISOString(),
+        attachments,
+        raw: message,
+      };
+    });
+  }
 
   private decodeBase64(data: string): string {
     try {
@@ -147,28 +142,32 @@ export class EmailService {
     }
   }
 
-  // private getDummyEmails(): Email[] {
-  //   return [
-  //     {
-  //       _id: '1',
-  //       title: 'Welcome to AudioEmailer',
-  //       body: 'Welcome to AudioEmailer! We are excited to have you on board...',
-  //       senderName: 'AudioEmailer Team',
-  //       senderAddress: 'contact@audioemailer.com',
-  //       timestamp: '2023-10-15T09:30:00',
-  //       attachments: [],
-  //     },
-  //     {
-  //       _id: '2',
-  //       title: 'Your Weekly Digest',
-  //       body: 'Here are the top stories from this week...',
-  //       senderName: 'AudioEmailer Team',
-  //       senderAddress: 'contact@audioemailer.com',
-  //       timestamp: '2023-10-15T09:30:00',
-  //       attachments: [],
-  //     },
-  //   ];
-  // }
+  public getDummyEmails(): Email[] {
+    return [
+      {
+        threadId: 'dummy-thread-1',
+        labelIds: ['INBOX'],
+        snippet: 'Welcome to AudioEmailer!',
+        from: 'AudioEmailer Team <contact@audioemailer.com>',
+        to: 'you@example.com',
+        subject: 'Welcome to AudioEmailer',
+        texts: ['Welcome to AudioEmailer! We are excited to have you on board.'],
+        date: new Date().toISOString(),
+        attachments: [],
+      },
+      {
+        threadId: 'dummy-thread-2',
+        labelIds: ['INBOX'],
+        snippet: 'Weekly Digest - Top Stories',
+        from: 'AudioEmailer Team <contact@audioemailer.com>',
+        to: 'you@example.com',
+        subject: 'Your Weekly Digest',
+        texts: ['Here are the top stories from this week...'],
+        date: new Date().toISOString(),
+        attachments: [],
+      }
+    ];
+  }
 
   clearEmails(): void {
     this.emails.set([]);
