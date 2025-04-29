@@ -3,8 +3,8 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'dashboard-layout',
-  imports: [RouterModule],
   standalone: true,
+  imports: [RouterModule],
   template: `
     <main class="flex flex-col min-h-screen w-full">
       <router-outlet></router-outlet>

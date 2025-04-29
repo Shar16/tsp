@@ -20,10 +20,10 @@ import { NgClass } from '@angular/common';
   template: `
     <dashboard-layout>
       @if (!this.settingsService.isLoading()) {
-      <div class="grid grid-cols-6 h-screen">
-        
+      <div class="flex h-screen">
+
         <!-- Sidebar -->
-        <div class="col-span-1 flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4 justify-between">
+        <aside class="w-[250px] bg-gray-100 dark:bg-gray-900 p-4 flex flex-col justify-between">
           <div class="flex flex-col items-center gap-4">
             <div class="w-20 h-20 rounded-full bg-gray-300 dark:bg-gray-700"></div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -31,81 +31,55 @@ import { NgClass } from '@angular/common';
             </h2>
             <div class="flex flex-col gap-4 mt-6 w-full">
               <button 
-                class="w-full py-3 rounded-lg font-medium" 
-                [ngClass]="selectedTab() === 'INBOX' ? 'bg-gray-300 dark:bg-gray-700 text-black' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200'"
+                class="w-full py-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-700"
+                [ngClass]="{ 'bg-gray-300 dark:bg-gray-700': selectedTab() === 'INBOX' }"
                 (click)="selectTab('INBOX')"
               >
                 All Emails
               </button>
               <button 
-                class="w-full py-3 rounded-lg font-medium" 
-                [ngClass]="selectedTab() === 'STARRED' ? 'bg-gray-300 dark:bg-gray-700 text-black' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200'"
+                class="w-full py-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-700"
+                [ngClass]="{ 'bg-gray-300 dark:bg-gray-700': selectedTab() === 'STARRED' }"
                 (click)="selectTab('STARRED')"
               >
                 Starred Emails
               </button>
               <button 
-                class="w-full py-3 rounded-lg font-medium" 
-                [ngClass]="selectedTab() === 'SENT' ? 'bg-gray-300 dark:bg-gray-700 text-black' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200'"
+                class="w-full py-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-700"
+                [ngClass]="{ 'bg-gray-300 dark:bg-gray-700': selectedTab() === 'SENT' }"
                 (click)="selectTab('SENT')"
               >
                 Sent Emails
               </button>
               <button 
-                class="w-full py-3 rounded-lg font-medium" 
-                [ngClass]="selectedTab() === 'TRASH' ? 'bg-gray-300 dark:bg-gray-700 text-black' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200'"
+                class="w-full py-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-700"
+                [ngClass]="{ 'bg-gray-300 dark:bg-gray-700': selectedTab() === 'TRASH' }"
                 (click)="selectTab('TRASH')"
               >
                 Trash Emails
               </button>
             </div>
           </div>
-          <button class="w-full py-3 mt-8 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-700">
+
+          <button 
+            class="w-full py-3 mt-8 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
             Settings
           </button>
-        </div>
+        </aside>
 
-        <!-- Email List -->
-        <div class="col-span-2 h-full overflow-y-auto border-r">
-          <div class="p-4 border-b">
-            <h1 class="text-xl font-bold">All Emails</h1>
-            <p class="text-sm text-gray-500">222 messages 44 unread</p>
-          </div>
-          <div class="flex flex-col">
-            @for (email of this.emailService.emails(); track $index) {
-            <div 
-              class="flex items-center justify-between border-b p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-              (click)="selectEmail(email.threadId)"
-            >
-              <div>
-                <div class="font-semibold">{{ email.from }}</div>
-                <div class="text-gray-500">{{ email.subject }}</div>
-                <div class="text-xs text-gray-400">{{ email.snippet.slice(0, 40) }}...</div>
-              </div>
-              <div class="flex flex-col items-center">
-                <span class="text-xs text-gray-400">{{ email.date.split('T')[1].slice(0,5) }}</span>
-                <button
-                  (click)="speakEmail(email)"
-                  class="mt-2 p-2 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
-                >
-                  ▶️
-                </button>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
 
-        <!-- Email Detail -->
-        <div class="col-span-3 p-6 overflow-y-auto">
-          <div class="h-[80px] flex items-center justify-between p-4 border-b">
+          <!-- Header -->
+          <header class="h-20 flex items-center justify-between px-6 border-b">
             <div class="flex gap-4 items-center">
               <label for="voice-select">Choose a voice:</label>
               <select
                 (change)="onVoiceChange($event)"
                 name="voices"
                 id="voice-select"
-                class="px-4 py-3 rounded-lg border"
+                class="px-4 py-2 rounded-lg border"
               >
                 @for (voice of this.speakSynthesisService.getVoices(); track $index) {
                 <option
@@ -121,42 +95,82 @@ import { NgClass } from '@angular/common';
               @if (this.speakSynthesisService.speaking()) {
               <button
                 (click)="this.speakSynthesisService.cancel()"
-                class="text-white font-bold bg-red-500 px-6 py-3 rounded-xl"
+                class="text-white font-bold bg-red-500 px-6 py-2 rounded-xl"
               >
                 Stop Reading
               </button>
               }
               <button
                 (click)="speak()"
-                class="text-white font-bold bg-black px-6 py-3 rounded-xl"
+                class="text-white font-bold bg-black px-6 py-2 rounded-xl"
               >
                 Read Email
               </button>
             </div>
+          </header>
+
+          <!-- Content Area -->
+          <div class="flex flex-1 overflow-hidden">
+
+            <!-- Email List -->
+            <section class="w-1/3 border-r overflow-y-auto">
+              <div class="p-4 border-b">
+                <h1 class="text-xl font-bold">All Emails</h1>
+                <p class="text-sm text-gray-500">222 messages 44 unread</p>
+              </div>
+              <div class="flex flex-col">
+                @for (email of this.emailService.emails(); track $index) {
+                <div 
+                  class="flex items-center justify-between border-b p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                  (click)="selectEmail(email.threadId)"
+                >
+                  <div>
+                    <div class="font-semibold">{{ email.from }}</div>
+                    <div class="text-gray-500">{{ email.subject }}</div>
+                    <div class="text-xs text-gray-400">{{ email.snippet.slice(0, 40) }}...</div>
+                  </div>
+                  <div class="flex flex-col items-center">
+                    <span class="text-xs text-gray-400">{{ email.date.split('T')[1].slice(0,5) }}</span>
+                    <button
+                      (click)="speakEmail(email)"
+                      class="mt-2 p-2 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
+                    >
+                      ▶️
+                    </button>
+                  </div>
+                </div>
+                }
+              </div>
+            </section>
+
+            <!-- Email Content -->
+            <section class="flex-1 p-6 overflow-y-auto">
+              @if (emailService.selectedEmail()) {
+              <div class="flex justify-between items-center mb-4">
+                <div>
+                  <div class="text-lg font-semibold">From: {{ emailService.selectedEmail()!.from }}</div>
+                  <div class="text-md">Subject: {{ emailService.selectedEmail()!.subject }}</div>
+                  <div class="text-sm text-gray-500">To: {{ settingsService.settings().name }}</div>
+                </div>
+                <div class="flex flex-col items-end">
+                  <span class="text-xs text-gray-400">{{ emailService.selectedEmail()!.date.split('T')[0] }}</span>
+                  <button
+                    (click)="speak()"
+                    class="mt-2 p-2 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
+                  >
+                    ▶️
+                  </button>
+                </div>
+              </div>
+              <hr class="mb-4">
+              <div class="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                {{ emailService.selectedEmail()!.texts[0] || '' }}
+              </div>
+              }
+            </section>
+
           </div>
 
-          @if (emailService.selectedEmail()) {
-          <div class="flex justify-between items-center mb-4">
-            <div>
-              <div class="text-lg font-semibold">From: {{ emailService.selectedEmail()!.from }}</div>
-              <div class="text-md">Subject: {{ emailService.selectedEmail()!.subject }}</div>
-              <div class="text-sm text-gray-500">To: {{ settingsService.settings().name }}</div>
-            </div>
-            <div class="flex flex-col items-end">
-              <span class="text-xs text-gray-400">{{ emailService.selectedEmail()!.date.split('T')[0] }}</span>
-              <button
-                (click)="speak()"
-                class="mt-2 p-2 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
-              >
-                ▶️
-              </button>
-            </div>
-          </div>
-          <hr class="mb-4">
-          <div class="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-            {{ emailService.selectedEmail()!.texts[0] || '' }}
-          </div>
-          }
         </div>
 
       </div>
@@ -200,7 +214,7 @@ export class DashboardPage implements OnInit {
       0,
       10,
       tab,
-      this.settingsService.linkedAccounts()[0]?.email || ''
+      this.settingsService.settings().email || ''
     );
   }
 
