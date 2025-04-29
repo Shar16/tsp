@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [RouterModule],
   template: `
-    <main class="flex flex-col min-h-screen w-full">
+    <main class="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <router-outlet></router-outlet>
       <ng-content></ng-content>
     </main>
